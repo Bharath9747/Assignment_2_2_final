@@ -5,14 +5,11 @@ import Java_Application.service.DatabaseServices;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.*;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Map;
 
 import static Java_Application.repo.CandidateRepo.canditateDetailsHashMap;
 
 public class DatabaseServicesImpl implements DatabaseServices {
-    Connection connection = null;
 
     BasicDataSource dataSource = null;
 
@@ -147,7 +144,7 @@ public class DatabaseServicesImpl implements DatabaseServices {
             String truncateQuery = "Truncate table Interview_Status";
             truncateStatement.executeUpdate(truncateQuery);
             canditateDetailsHashMap.entrySet().parallelStream().forEach(
-                    entry->  insert(entry)
+                    this::insert
             );
             System.out.println("Insertion Done");
         } catch (Exception e) {
@@ -159,11 +156,11 @@ public class DatabaseServicesImpl implements DatabaseServices {
     private void insert(Map.Entry<Integer, CanditateDetails> entry) {
         try {
 
-            Connection con = null;
+            Connection con;
             con = dataSource.getConnection();
             con.setAutoCommit(false);
             String insertQuery = "INSERT INTO Interview_Status (Id, Name, Skill, InterviewDate, InterviewTime, TeamName, PanelName, InterviewRound, PreferredLocation, WorkLocation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement insertStatement = null;
+            PreparedStatement insertStatement;
             insertStatement = con.prepareStatement(insertQuery);
             CanditateDetails candidate = entry.getValue();
             insertStatement.setInt(1, entry.getKey());

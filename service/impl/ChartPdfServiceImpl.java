@@ -49,9 +49,7 @@ public class ChartPdfServiceImpl implements ChartPdfServices {
         months.put(12,"December");
         monthCount = interviewDetailsList.stream().collect(Collectors.groupingBy(interviewDetails -> months.get(interviewDetails.getInterviewDate().getMonth()+1),Collectors.counting()));
         DefaultPieDataset dataset = new DefaultPieDataset( );
-        monthCount.entrySet().forEach(
-                (x)->dataset.setValue(x.getKey(),x.getValue())
-        );
+        monthCount.forEach(dataset::setValue);
 
         JFreeChart chart = ChartFactory.createPieChart(
                 "Interviews Count Per Month",
@@ -133,17 +131,15 @@ public class ChartPdfServiceImpl implements ChartPdfServices {
             List<InterviewDetails> interviewDetailsList = getAllInterviewDetails();
 
             int finalI = i-1;
-            Map<String, Long> interviewRoundCount = interviewDetailsList.stream().filter(interviewDetails -> interviewDetails.getInterviewDate().getMonth()== finalI).collect(Collectors.groupingBy(interviewDetails -> interviewDetails.getInterviewRound(), Collectors.counting()));
+            Map<String, Long> interviewRoundCount = interviewDetailsList.stream().filter(interviewDetails -> interviewDetails.getInterviewDate().getMonth()== finalI).collect(Collectors.groupingBy(InterviewDetails::getInterviewRound, Collectors.counting()));
 
-            Map<String, Long> workLocationCount = canditateDetailsHashMap.values().stream().filter(canditateDetails -> canditateDetails.getInterviewDetailsList().getInterviewDate().getMonth()==finalI).map(CanditateDetails::getWorkLocation).map(WorkLocation::getWorkLocation).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(workLocation->workLocation,Collectors.counting()));
-            Map<String, Long> preferedLocationCount =canditateDetailsHashMap.values().stream().filter(canditateDetails -> canditateDetails.getInterviewDetailsList().getInterviewDate().getMonth()==finalI).map(CanditateDetails::getWorkLocation).map(WorkLocation::getPreferredLocation).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(preferedLocation->preferedLocation,Collectors.counting()));
-            Map<String, Long> skillCount =canditateDetailsHashMap.values().stream().filter(canditateDetails -> canditateDetails.getInterviewDetailsList().getInterviewDate().getMonth()==finalI).map(CanditateDetails::getSkill).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(skill->skill,Collectors.counting()));
-            Map<String, Long> teamCount = interviewDetailsList.stream().filter(interviewDetails -> interviewDetails.getInterviewDate().getMonth()== finalI).collect(Collectors.groupingBy(interviewDetails -> interviewDetails.getTeamName(), Collectors.counting()));
+            Map<String, Long> workLocationCount = canditateDetailsHashMap.values().stream().filter(canditateDetails -> canditateDetails.getInterviewDetailsList().getInterviewDate().getMonth()==finalI).map(CanditateDetails::getWorkLocation).map(WorkLocation::getWorkLocation).toList().stream().collect(Collectors.groupingBy(workLocation->workLocation,Collectors.counting()));
+            Map<String, Long> preferedLocationCount =canditateDetailsHashMap.values().stream().filter(canditateDetails -> canditateDetails.getInterviewDetailsList().getInterviewDate().getMonth()==finalI).map(CanditateDetails::getWorkLocation).map(WorkLocation::getPreferredLocation).toList().stream().collect(Collectors.groupingBy(preferedLocation->preferedLocation,Collectors.counting()));
+            Map<String, Long> skillCount =canditateDetailsHashMap.values().stream().filter(canditateDetails -> canditateDetails.getInterviewDetailsList().getInterviewDate().getMonth()==finalI).map(CanditateDetails::getSkill).toList().stream().collect(Collectors.groupingBy(skill->skill,Collectors.counting()));
+            Map<String, Long> teamCount = interviewDetailsList.stream().filter(interviewDetails -> interviewDetails.getInterviewDate().getMonth()== finalI).collect(Collectors.groupingBy(InterviewDetails::getTeamName, Collectors.counting()));
 
             DefaultPieDataset dataset = new DefaultPieDataset( );
-            interviewRoundCount.entrySet().forEach(
-                    (x)->dataset.setValue(x.getKey(),x.getValue())
-            );
+            interviewRoundCount.forEach(dataset::setValue);
 
             JFreeChart chart = ChartFactory.createPieChart(
                     "Interviews Rounds Count",
@@ -164,13 +160,12 @@ public class ChartPdfServiceImpl implements ChartPdfServices {
             List<String > locations = new ArrayList<>(Arrays.asList("CHENNAI","BANGALORE","HYDERABAD"));
             DefaultPieDataset dataset1 = new DefaultPieDataset( );
             final int[] s = {0};
-            workLocationCount.entrySet().forEach(
-                    (x)->   {if(locations.contains(x.getKey()))
-                        dataset1.setValue(x.getKey(),x.getValue());
-                    else
-                        s[0] = s[0] +1;
-                    }
-            );
+            workLocationCount.forEach((key, value) -> {
+                if (locations.contains(key))
+                    dataset1.setValue(key, value);
+                else
+                    s[0] = s[0] + 1;
+            });
             dataset1.setValue("Others",s[0]);
 
             JFreeChart chart1 = ChartFactory.createPieChart(
@@ -188,13 +183,12 @@ public class ChartPdfServiceImpl implements ChartPdfServices {
             workLocationCountList.add(workLocationCount);
             DefaultPieDataset dataset2 = new DefaultPieDataset( );
             s[0]=0;
-            preferedLocationCount.entrySet().forEach(
-                    (x)->   {if(locations.contains(x.getKey()))
-                        dataset2.setValue(x.getKey(),x.getValue());
-                    else
-                        s[0] = s[0] +1;
-                    }
-            );
+            preferedLocationCount.forEach((key, value) -> {
+                if (locations.contains(key))
+                    dataset2.setValue(key, value);
+                else
+                    s[0] = s[0] + 1;
+            });
             dataset2.setValue("Others",s[0]);
             preferedLocationCountLiist.add(preferedLocationCount);
 
@@ -214,13 +208,12 @@ public class ChartPdfServiceImpl implements ChartPdfServices {
             List<String > skills = new ArrayList<>(Arrays.asList("JAVA","ANGULAR","QA"));
             DefaultPieDataset dataset3 = new DefaultPieDataset( );
             s[0]=0;
-            skillCount.entrySet().forEach(
-                    (x)->   {if(skills.contains(x.getKey()))
-                        dataset3.setValue(x.getKey(),x.getValue());
-                    else
-                        s[0] = s[0] +1;
-                    }
-            );
+            skillCount.forEach((key, value) -> {
+                if (skills.contains(key))
+                    dataset3.setValue(key, value);
+                else
+                    s[0] = s[0] + 1;
+            });
             dataset3.setValue("Others",s[0]);
             skillCountList.add(skillCount);
             JFreeChart chart3 = ChartFactory.createPieChart(
@@ -238,13 +231,12 @@ public class ChartPdfServiceImpl implements ChartPdfServices {
 
             DefaultPieDataset dataset4 = new DefaultPieDataset( );
             s[0]=0;
-            teamCount.entrySet().forEach(
-                    (x)->   {if(x.getKey().equals("BENCH"))
-                        dataset4.setValue(x.getKey(),x.getValue());
-                    else
-                        s[0] = s[0] +1;
-                    }
-            );
+            teamCount.forEach((key, value) -> {
+                if (key.equals("BENCH"))
+                    dataset4.setValue(key, value);
+                else
+                    s[0] = s[0] + 1;
+            });
             dataset4.setValue("Others",s[0]);
             teamCountList.add(teamCount);
             JFreeChart chart4 = ChartFactory.createPieChart(
@@ -289,16 +281,14 @@ public class ChartPdfServiceImpl implements ChartPdfServices {
             doc.add(
                     new Image(ImageDataFactory.create("C:\\Users\\bharath.m\\IdeaProjects\\Assignment_2\\src\\main\\resources\\img\\MonthCount.jpeg")).setTextAlignment(TextAlignment.CENTER)
             );
-            float colwid1[] = {260, 260};
+            float[] colwid1 = {260, 260};
             com.itextpdf.layout.element.Table t1 = new com.itextpdf.layout.element.Table(colwid1).setFontSize(15f);
             t1.addCell(new com.itextpdf.layout.element.Cell().add("Month"));
             t1.addCell(new com.itextpdf.layout.element.Cell().add("Interview Count"));
-            monthCount.entrySet().forEach(
-                    (x)-> {
-                        t1.addCell(new com.itextpdf.layout.element.Cell().add(x.getKey()));
-                        t1.addCell(new com.itextpdf.layout.element.Cell().add(x.getValue()+""));
-                    }
-            );
+            monthCount.forEach((key, value) -> {
+                t1.addCell(new com.itextpdf.layout.element.Cell().add(key));
+                t1.addCell(new com.itextpdf.layout.element.Cell().add(value + ""));
+            });
             doc.add(new Paragraph("\n"));
             doc.add(new Paragraph("\n"));
             doc.add(new Paragraph("\n"));
@@ -327,20 +317,12 @@ public class ChartPdfServiceImpl implements ChartPdfServices {
             t2.addCell(new com.itextpdf.layout.element.Cell().add("Skill Count"));
             t2.addCell(new com.itextpdf.layout.element.Cell().add("Skill Count"));
             doc.add(new Paragraph("\n"));
-            sortedSkillCountByMonth.entrySet().forEach(
-                    (x)->{
-                        t2.addCell(new com.itextpdf.layout.element.Cell().add("Month "+x.getKey()).setBold());
-                        t2.addCell(new com.itextpdf.layout.element.Cell().add(""));
-                        x.getValue().entrySet().forEach(
-                                (y)->{
-                                    t2.addCell(new com.itextpdf.layout.element.Cell().add(y.getKey()+" "+y.getValue()));
-
-                                }
-
-                        );
-                        t2.addCell(new com.itextpdf.layout.element.Cell().add(""));
-                    }
-            );
+            sortedSkillCountByMonth.forEach((key1, value1) -> {
+                t2.addCell(new com.itextpdf.layout.element.Cell().add("Month " + key1).setBold());
+                t2.addCell(new com.itextpdf.layout.element.Cell().add(""));
+                value1.forEach((key, value) -> t2.addCell(new com.itextpdf.layout.element.Cell().add(key + " " + value)));
+                t2.addCell(new com.itextpdf.layout.element.Cell().add(""));
+            });
             t2.addCell(new com.itextpdf.layout.element.Cell().add(""));
             doc.add(t2);
             doc.add(new Paragraph()
@@ -369,19 +351,12 @@ public class ChartPdfServiceImpl implements ChartPdfServices {
             com.itextpdf.layout.element.Table t3 = new com.itextpdf.layout.element.Table(colwid1).setFontSize(15f);
             t3.addCell(new com.itextpdf.layout.element.Cell().add("Location Count"));
             t3.addCell(new com.itextpdf.layout.element.Cell().add("Location Count"));
-            sortedworkLocationByMonth.entrySet().forEach(
-                    (x)->{
-                        t3.addCell(new com.itextpdf.layout.element.Cell().add("Month "+x.getKey()).setBold());
-                        t3.addCell(new com.itextpdf.layout.element.Cell().add(""));
-                        x.getValue().entrySet().forEach(
-                                (y)->{
-                                    t3.addCell(new com.itextpdf.layout.element.Cell().add(y.getKey()+" "+y.getValue()));
-                                }
-
-                        );
-                        t3.addCell(new com.itextpdf.layout.element.Cell().add(""));
-                    }
-            );
+            sortedworkLocationByMonth.forEach((key1, value1) -> {
+                t3.addCell(new com.itextpdf.layout.element.Cell().add("Month " + key1).setBold());
+                t3.addCell(new com.itextpdf.layout.element.Cell().add(""));
+                value1.forEach((key, value) -> t3.addCell(new com.itextpdf.layout.element.Cell().add(key + " " + value)));
+                t3.addCell(new com.itextpdf.layout.element.Cell().add(""));
+            });
 
             doc.add(new Paragraph("\n"));
             t3.addCell(new com.itextpdf.layout.element.Cell().add(""));
@@ -445,16 +420,14 @@ public class ChartPdfServiceImpl implements ChartPdfServices {
                 doc.add(new Paragraph("\n"));
                 doc.add(new Paragraph("\n"));
                 doc.add(new Paragraph("\n"));doc.add(new Paragraph("\n"));
-                float colwid1[] = {260, 260};
+                float[] colwid1 = {260, 260};
                 com.itextpdf.layout.element.Table t1 = new com.itextpdf.layout.element.Table(colwid1).setFontSize(15f);
                 t1.addCell(new com.itextpdf.layout.element.Cell().add("Interview Round").setBold());
                 t1.addCell(new com.itextpdf.layout.element.Cell().add("Count").setBold());
-                temp.entrySet().forEach(
-                        (x)-> {
-                            t1.addCell(new com.itextpdf.layout.element.Cell().add(x.getKey()));
-                            t1.addCell(new com.itextpdf.layout.element.Cell().add(x.getValue()+""));
-                        }
-                );
+                temp.forEach((key, value) -> {
+                    t1.addCell(new com.itextpdf.layout.element.Cell().add(key));
+                    t1.addCell(new com.itextpdf.layout.element.Cell().add(value + ""));
+                });
                 doc.add(t1);
                 doc.add(new Paragraph("\n"));
                 temp   = workLocationCountList.get(i).entrySet().stream().sorted(Map.Entry.<String,Long>comparingByValue().reversed()).collect(Collectors.toMap(
@@ -472,12 +445,10 @@ public class ChartPdfServiceImpl implements ChartPdfServices {
                 com.itextpdf.layout.element.Table t2 = new com.itextpdf.layout.element.Table(colwid1).setFontSize(15f);
                 t2.addCell(new com.itextpdf.layout.element.Cell().add("Location").setBold());
                 t2.addCell(new com.itextpdf.layout.element.Cell().add("Count").setBold());
-                temp.entrySet().forEach(
-                        (x)-> {
-                            t2.addCell(new com.itextpdf.layout.element.Cell().add(x.getKey()));
-                            t2.addCell(new com.itextpdf.layout.element.Cell().add(x.getValue()+""));
-                        }
-                );
+                temp.forEach((key, value) -> {
+                    t2.addCell(new com.itextpdf.layout.element.Cell().add(key));
+                    t2.addCell(new com.itextpdf.layout.element.Cell().add(value + ""));
+                });
                 doc.add(t2);
                 doc.add(new Paragraph("\n"));
                 doc.add(new Paragraph("\n"));
@@ -495,12 +466,10 @@ public class ChartPdfServiceImpl implements ChartPdfServices {
                 com.itextpdf.layout.element.Table t3 = new com.itextpdf.layout.element.Table(colwid1).setFontSize(15f);
                 t3.addCell(new com.itextpdf.layout.element.Cell().add("Location").setBold());
                 t3.addCell(new com.itextpdf.layout.element.Cell().add("Count").setBold());
-                temp.entrySet().forEach(
-                        (x)-> {
-                            t3.addCell(new com.itextpdf.layout.element.Cell().add(x.getKey()));
-                            t3.addCell(new com.itextpdf.layout.element.Cell().add(x.getValue()+""));
-                        }
-                );
+                temp.forEach((key, value) -> {
+                    t3.addCell(new com.itextpdf.layout.element.Cell().add(key));
+                    t3.addCell(new com.itextpdf.layout.element.Cell().add(value + ""));
+                });
                 doc.add(t3);
                 doc.add(new Paragraph("\n"));
                 doc.add(new Paragraph("\n"));
@@ -518,12 +487,10 @@ public class ChartPdfServiceImpl implements ChartPdfServices {
                 com.itextpdf.layout.element.Table t4 = new com.itextpdf.layout.element.Table(colwid1).setFontSize(15f);
                 t4.addCell(new com.itextpdf.layout.element.Cell().add("Skill").setBold());
                 t4.addCell(new com.itextpdf.layout.element.Cell().add("Count").setBold());
-                temp.entrySet().forEach(
-                        (x)-> {
-                            t4.addCell(new com.itextpdf.layout.element.Cell().add(x.getKey()));
-                            t4.addCell(new com.itextpdf.layout.element.Cell().add(x.getValue()+""));
-                        }
-                );
+                temp.forEach((key, value) -> {
+                    t4.addCell(new com.itextpdf.layout.element.Cell().add(key));
+                    t4.addCell(new com.itextpdf.layout.element.Cell().add(value + ""));
+                });
                 doc.add(t4);
                 doc.add(new Paragraph("\n"));
                 doc.add(new Paragraph("\n"));
@@ -541,12 +508,10 @@ public class ChartPdfServiceImpl implements ChartPdfServices {
                 com.itextpdf.layout.element.Table t5 = new com.itextpdf.layout.element.Table(colwid1).setFontSize(15f);
                 t5.addCell(new com.itextpdf.layout.element.Cell().add("Team").setBold());
                 t5.addCell(new com.itextpdf.layout.element.Cell().add("Count").setBold());
-                temp.entrySet().forEach(
-                        (x)-> {
-                            t5.addCell(new com.itextpdf.layout.element.Cell().add(x.getKey()));
-                            t5.addCell(new com.itextpdf.layout.element.Cell().add(x.getValue()+""));
-                        }
-                );
+                temp.forEach((key, value) -> {
+                    t5.addCell(new com.itextpdf.layout.element.Cell().add(key));
+                    t5.addCell(new com.itextpdf.layout.element.Cell().add(value + ""));
+                });
                 doc.add(t5);
                 doc.close();
             }

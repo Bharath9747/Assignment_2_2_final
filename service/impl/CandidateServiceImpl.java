@@ -5,31 +5,10 @@ import Java_Application.model.CanditateDetails;
 import Java_Application.model.InterviewDetails;
 import Java_Application.model.WorkLocation;
 import Java_Application.service.CandidateServices;
-
-import com.itextpdf.io.image.ImageDataFactory;
-import com.itextpdf.kernel.geom.PageSize;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.border.Border;
-import com.itextpdf.layout.element.Image;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Text;
-import com.itextpdf.layout.property.TextAlignment;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultPieDataset;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
@@ -97,9 +76,7 @@ public class CandidateServiceImpl implements CandidateServices {
 
     private boolean isMonth(Date interviewDate) {
         int month = interviewDate.getMonth()+1;
-        if(month==10 || month==11)
-            return true;
-        return false;
+        return month == 10 || month == 11;
     }
 
 
@@ -110,13 +87,12 @@ public class CandidateServiceImpl implements CandidateServices {
 
 
 
-    private LocalTime parseTime(double s) throws ParseException {
-        ;
+    private LocalTime parseTime(double s) {
+
         long javaTimeValue = Math.round((s-25569)*86400*1000);
 
         LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(javaTimeValue), ZoneId.of("Asia/Kolkata"));
-        LocalTime localTime = localDateTime.toLocalTime().minusHours(5).minusMinutes(21).minusSeconds(10);
-        return localTime;
+        return localDateTime.toLocalTime().minusHours(5).minusMinutes(21).minusSeconds(10);
     }
 
     private Date parseDate(String s) throws ParseException {
